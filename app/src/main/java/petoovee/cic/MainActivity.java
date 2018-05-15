@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
@@ -24,12 +25,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         button = (Button) findViewById(R.id.button);
         initSumText = (EditText) findViewById(R.id.initSum);
         monthlyDepositText = (EditText) findViewById(R.id.monthlyDeposit);
         yearlyInterestText = (EditText) findViewById(R.id.yearlyInterest);
         monthsText = (EditText) findViewById(R.id.months);
         ad = (PublisherAdView)findViewById(R.id.ad);
+
+        MobileAds.initialize(this, "ca-app-pub-7938385350213513~8813666583");
         final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
         ad.loadAd(adRequest);
 

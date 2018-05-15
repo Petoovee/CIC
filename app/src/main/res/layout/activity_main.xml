@@ -83,7 +83,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         app:adSize="BANNER"
-        app:adUnitId="/6499/example/banner"
+        app:adUnitId="ca-app-pub-7938385350213513/4822149361"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
