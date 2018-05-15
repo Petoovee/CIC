@@ -1,17 +1,12 @@
-CIC/\.idea/caches/
-
-CIC/\.idea/
-
-\.idea/caches/
+*.iml
+.gradle
+/local.properties
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
 
 \.idea/
-
-\.gradle/4\.4/taskHistory/
-
-local\.properties
-
-app/app\.iml
-
-\.gradle/buildOutputCleanup/
-
-\.gradle/4\.4/fileHashes/
