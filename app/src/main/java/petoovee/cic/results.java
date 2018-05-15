@@ -1,4 +1,4 @@
-package petoovee.cucalculator;
+package petoovee.cic;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
