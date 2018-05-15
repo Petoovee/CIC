@@ -9,4 +9,18 @@
 /captures
 .externalNativeBuild
 
+\.idea/caches/
+
+\.idea/
+
+\.gradle/4\.4/taskHistory/
+
+local\.properties
+
+app/app\.iml
+
+\.gradle/buildOutputCleanup/
+
+\.gradle/4\.4/fileHashes/
+
 \.idea/
