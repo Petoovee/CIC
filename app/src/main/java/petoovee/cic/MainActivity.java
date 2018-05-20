@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     EditText initSumText, monthlyDepositText, yearlyInterestText, monthsText;
     static ArrayList<String> results = new ArrayList<>();
     private PublisherAdView ad;
+    Double initSum, monthlyDeposit, yearlyInterest, monthlyInterest;
+    int months;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +43,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (initSumText.length() != 0 && monthlyDepositText.length() != 0 && yearlyInterestText.length() != 0 && monthsText.length() != 0){
-                Double initSum = Double.parseDouble(initSumText.getText().toString());
-                Double monthlyDeposit = Double.parseDouble(monthlyDepositText.getText().toString());
-                Double yearlyInterest = Double.parseDouble(yearlyInterestText.getText().toString());
-                Double monthlyInterest = yearlyInterest/12.0;
-                Toast.makeText(MainActivity.this, "Monthly interest " +monthlyInterest +"%", Toast.LENGTH_LONG).show();
-                monthlyInterest = monthlyInterest/100;
-                int months = Integer.parseInt(monthsText.getText().toString());
+
+                    // Data gathering
+                initSum = Double.parseDouble(initSumText.getText().toString());
+                monthlyDeposit = Double.parseDouble(monthlyDepositText.getText().toString());
+                yearlyInterest = Double.parseDouble(yearlyInterestText.getText().toString());
+                monthlyInterest = yearlyInterest/1200;
+                months = Integer.parseInt(monthsText.getText().toString());
+
+                // Calculation part
                 Double sum = initSum;
                 Double interest;
                 Double totalInterest = 0.0;
@@ -59,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     returnVal.add("Month " +i +"\nSum: " +sum +"\nInterest: " +interest +"\nTotal interest: " +totalInterest);
                 }
                 setResults(returnVal);
-                ad.loadAd(adRequest);
+
+                // Load results
                 Intent intent = new Intent(MainActivity.this, results.class);
                 startActivity(intent);
             }
