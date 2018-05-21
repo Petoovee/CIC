@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -20,8 +19,6 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
-
-import static android.support.v7.widget.AppCompatDrawableManager.get;
 
 public class results extends AppCompatActivity {
     ListView listView;
@@ -58,16 +55,16 @@ public class results extends AppCompatActivity {
     }
 
 
-    public class AdAdapter extends BaseAdapter{
+    public class AdAdapter extends BaseAdapter {
 
         ArrayList<String> convertedResults = new ArrayList<>();
         Context context;
         LayoutInflater layoutInflater;
 
-        public AdAdapter(ArrayList<String> convertedResults, Context context){
+        public AdAdapter(ArrayList<String> convertedResults, Context context) {
             this.convertedResults = convertedResults;
             this.context = context;
-            this.layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
@@ -87,8 +84,8 @@ public class results extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null){
-                if(convertedResults.get(0).equals("ad")){
+            if (convertView == null) {
+                if (convertedResults.get(0).equals("ad")) {
                     PublisherAdView convertAdView = new PublisherAdView(context);
                     convertAdView.setAdUnitId("ca-app-pub-7938385350213513/4460170795");
                     convertAdView.setAdSizes(AdSize.BANNER);
@@ -96,9 +93,9 @@ public class results extends AppCompatActivity {
                     final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
                     convertAdView.loadAd(adRequest);
                     return convertAdView;
-                } else{
+                } else {
                     convertView = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                    TextView text = (TextView)convertView.findViewById(android.R.id.text1);
+                    TextView text = (TextView) convertView.findViewById(android.R.id.text1);
                     text.setText(convertedResults.get(0));
                 }
                 convertedResults.remove(0);
