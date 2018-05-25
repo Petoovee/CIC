@@ -1,21 +1,13 @@
 package petoovee.cic;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
@@ -23,6 +15,7 @@ import java.util.ArrayList;
 public class results extends AppCompatActivity {
     ListView listView;
     ArrayList<String> convertedResults = new ArrayList<>();
+    ArrayList<PublisherAdView> adList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +33,12 @@ public class results extends AppCompatActivity {
         for (int i = 0; i < MainActivity.getResults().size(); i++) {
             convertedResults.add(MainActivity.getResults().get(i));
         }
-        insertAds();
-        ListAdapter adapter = new AdAdapter(convertedResults, this);
+//        insertAds();
+        ListAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, convertedResults);
         listView.setAdapter(adapter);
+//        AdLoader adLoader = new AdLoader();
+//        adLoader.start();
+        Toast.makeText(results.this, "Ads to load: " + adList.size(), Toast.LENGTH_LONG).show();
     }
 
     private void insertAds() {
@@ -51,6 +47,35 @@ public class results extends AppCompatActivity {
         for (int i = MainActivity.getResults().size() / adQuantity; i < MainActivity.getResults().size(); i += MainActivity.getResults().size() / adQuantity) {
             convertedResults.add(i, "ad");
             Toast.makeText(results.this, "Showing ad at position " + i, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void putAd(PublisherAdView ad) {
+        adList.add(ad);
+    }
+
+    public ArrayList<PublisherAdView> getAds() {
+        return adList;
+    }
+
+/*    public class AdLoader extends Thread {
+
+        ArrayList<PublisherAdView> adList = getAds();
+        @Override
+        public void run() {
+//            Toast.makeText(results.this, "AdLoader started", Toast.LENGTH_LONG).show();
+            for(int i = 0; i < adList.size(); i++){
+                adList.get((i)).setAdUnitId("");
+                adList.get((i)).setAdSizes(AdSize.BANNER);
+                MobileAds.initialize(AdAdapter.getContext(), "ca-app-pub-7938385350213513~8813666583");
+                final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+                adList.get(i).loadAd(adRequest);
+                try {
+                    sleep(5000);
+                } catch (InterruptedException e) {
+                    Log.i("AdLoader", "Could not sleep!");
+                }
+            }
         }
     }
 
@@ -65,6 +90,10 @@ public class results extends AppCompatActivity {
             this.convertedResults = convertedResults;
             this.context = context;
             this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        public Context getContext() {
+            return context;
         }
 
         @Override
@@ -87,11 +116,7 @@ public class results extends AppCompatActivity {
             if (convertView == null) {
                 if (convertedResults.get(0).equals("ad")) {
                     PublisherAdView convertAdView = new PublisherAdView(context);
-                    convertAdView.setAdUnitId("ca-app-pub-7938385350213513/4460170795");
-                    convertAdView.setAdSizes(AdSize.BANNER);
-                    MobileAds.initialize(context, "ca-app-pub-7938385350213513~8813666583");
-                    final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-                    convertAdView.loadAd(adRequest);
+                    putAd(convertAdView);
                     return convertAdView;
                 } else {
                     convertView = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
@@ -102,6 +127,5 @@ public class results extends AppCompatActivity {
             }
             return convertView;
         }
-    }
-
+    }*/
 }
