@@ -1,8 +1,12 @@
 package petoovee.cic;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +27,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button button;
+    Button button, button2;
     EditText initSumText, monthlyDepositText, yearlyInterestText, monthsText;
     TextView adText, calcsLeft;
     static ArrayList<String> results = new ArrayList<>();
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         button = (Button) findViewById(R.id.button);
+        button2 = (Button) findViewById(R.id.button2);
         initSumText = (EditText) findViewById(R.id.initSum);
         monthlyDepositText = (EditText) findViewById(R.id.monthlyDeposit);
         yearlyInterestText = (EditText) findViewById(R.id.yearlyInterest);
@@ -145,38 +150,63 @@ public class MainActivity extends AppCompatActivity {
                                                   interstitialAd.show();
                                               }
                                           } else {
-                                              if (initSumText.length() != 0 && monthlyDepositText.length() != 0 && yearlyInterestText.length() != 0 && monthsText.length() != 0) {
-
-                                                  // Data gathering
-                                                  initSum = Double.parseDouble(initSumText.getText().toString());
-                                                  monthlyDeposit = Double.parseDouble(monthlyDepositText.getText().toString());
-                                                  yearlyInterest = Double.parseDouble(yearlyInterestText.getText().toString());
-                                                  monthlyInterest = yearlyInterest / 1200;
-                                                  months = Integer.parseInt(monthsText.getText().toString());
-
-                                                  // Calculation part
-                                                  Double sum = initSum;
-                                                  Double interest;
-                                                  Double totalInterest = 0.0;
-                                                  ArrayList<String> returnVal = new ArrayList<String>();
-                                                  for (int i = 1; i <= months; i++) {
-                                                      interest = sum * monthlyInterest;
-                                                      sum = sum + interest + monthlyDeposit;
-                                                      totalInterest += interest;
-                                                      returnVal.add("Month " + i + "\nSum: " + sum + "\nInterest: " + interest + "\nTotal interest: " + totalInterest);
-                                                  }
-                                                  setResults(returnVal);
+                                              calculate();
                                                   calculationsLeft--;
                                                   checkCalculationsLeft();
 
                                                   // Load results
                                                   Intent intent = new Intent(MainActivity.this, results.class);
                                                   startActivity(intent);
-                                              }
                                           }
                                       }
                                   }
         );
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkCalculationsLeft();
+                if (calculationsLeft < 5) {
+                    if (rewardedVideoAd.isLoaded()) {
+                        rewardedVideoAd.show();
+                    } else if (interstitialAd.isLoaded()) {
+                        interstitialAd.show();
+                    }
+                } else {
+                    calculate();
+                    calculationsLeft -= 5;
+                    checkCalculationsLeft();
+                    ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clipData = ClipData.newPlainText("CIC", TextUtils.join("\n\n", results));
+                    clipboardManager.setPrimaryClip(clipData);
+                }
+            }
+        });
+
+    }
+
+    public void calculate() {
+        if (initSumText.length() != 0 && monthlyDepositText.length() != 0 && yearlyInterestText.length() != 0 && monthsText.length() != 0) {
+            // Data gathering
+            initSum = Double.parseDouble(initSumText.getText().toString());
+            monthlyDeposit = Double.parseDouble(monthlyDepositText.getText().toString());
+            yearlyInterest = Double.parseDouble(yearlyInterestText.getText().toString());
+            monthlyInterest = yearlyInterest / 1200;
+            months = Integer.parseInt(monthsText.getText().toString());
+
+            // Calculation part
+            Double sum = initSum;
+            Double interest;
+            Double totalInterest = 0.0;
+            ArrayList<String> returnVal = new ArrayList<String>();
+            for (int i = 1; i <= months; i++) {
+                interest = sum * monthlyInterest;
+                sum = sum + interest + monthlyDeposit;
+                totalInterest += interest;
+                returnVal.add("Month " + i + "\nSum: " + sum + "\nInterest: " + interest + "\nTotal interest: " + totalInterest);
+            }
+            setResults(returnVal);
+        }
     }
 
     public void checkCalculationsLeft() {
