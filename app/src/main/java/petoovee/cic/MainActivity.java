@@ -4,10 +4,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
         adText.setVisibility(View.GONE);
         calcsLeft = (TextView) findViewById(R.id.calcsLeft);
 
+        fetchCalculationsLeft();
+        updateCalculationsLeft();
+
         MobileAds.initialize(MainActivity.this, "ca-app-pub-7938385350213513~8813666583");
 
         final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
@@ -64,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdClosed() {
                 calculationsLeft += bannerClickReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
             }
 
             @Override
             public void onAdLoaded() {
                 calculationsLeft += bannerReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
             }
         });
 
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRewardedVideoAdLeftApplication() {
                 calculationsLeft += videoClickReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
             }
 
             @Override
@@ -113,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRewardedVideoCompleted() {
                 calculationsLeft += videoReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
             }
         });
         rewardedVideoAd.loadAd("ca-app-pub-7938385350213513/9075332525",
@@ -125,14 +128,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdClosed() {
                 calculationsLeft += interstitialReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
                 interstitialAd.loadAd(new AdRequest.Builder().build());
             }
 
             @Override
             public void onAdLeftApplication() {
                 calculationsLeft += interstitialClickReward;
-                checkCalculationsLeft();
+                updateCalculationsLeft();
             }
 
         });
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
-                                          checkCalculationsLeft();
+                                          updateCalculationsLeft();
                                           if (calculationsLeft < 1) {
                                               if (rewardedVideoAd.isLoaded()) {
                                                   rewardedVideoAd.show();
@@ -152,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                                           } else {
                                               calculate();
                                                   calculationsLeft--;
-                                                  checkCalculationsLeft();
+                                                  updateCalculationsLeft();
 
                                                   // Load results
                                                   Intent intent = new Intent(MainActivity.this, results.class);
@@ -165,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkCalculationsLeft();
+                updateCalculationsLeft();
                 if (calculationsLeft < 5) {
                     if (rewardedVideoAd.isLoaded()) {
                         rewardedVideoAd.show();
@@ -175,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     calculate();
                     calculationsLeft -= 5;
-                    checkCalculationsLeft();
+                    updateCalculationsLeft();
                     ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clipData = ClipData.newPlainText("CIC", TextUtils.join("\n\n", results));
                     clipboardManager.setPrimaryClip(clipData);
@@ -209,24 +212,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void checkCalculationsLeft() {
+    public synchronized void updateCalculationsLeft() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 calcsLeft.setText("Calculations remaining: " + calculationsLeft);
             }
         });
-        if (calculationsLeft < 1 && ad.getVisibility() == View.GONE)
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ad.setVisibility(View.VISIBLE);
-                    MobileAds.initialize(MainActivity.this, "ca-app-pub-7938385350213513~8813666583");
-                    final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-                    ad.loadAd(adRequest);
-                }
-            });
+        saveCalculationsLeft();
+    }
 
+    public synchronized void fetchCalculationsLeft(){
+        SharedPreferences sharedPreferences = getSharedPreferences("calculationsLeft", Context.MODE_PRIVATE);
+        calculationsLeft = sharedPreferences.getInt("calculationsLeft", 0) + 0;
+    }
+
+    public synchronized void saveCalculationsLeft(){
+        SharedPreferences sharedPreferences = getSharedPreferences("calculationsLeft", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("calculationsLeft", calculationsLeft);
+        editor.apply();
     }
 
     public void setResults(ArrayList<String> Val) {
@@ -237,47 +242,15 @@ public class MainActivity extends AppCompatActivity {
         return results;
     }
 
-/*    public class AdWatcher extends Thread {
-        @Override
-        public void run() {
-            try {
-                synchronized (this) {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchCalculationsLeft();
+    }
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ad.destroy();
-                            ad.setVisibility(View.GONE);
-                            adText.setVisibility(View.VISIBLE);
-                            calculationsLeft += 2;
-                            calcsLeft.setText("Calculations remaining: " + calculationsLeft);
-                        }
-                    });
-
-                    wait(2000);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adText.setVisibility(View.GONE);
-                        }
-                    });
-
-                    wait(900000);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ad.setVisibility(View.VISIBLE);
-                            MobileAds.initialize(MainActivity.this, "ca-app-pub-7938385350213513~8813666583");
-                            final PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-                            ad.loadAd(adRequest);
-                        }
-                    });
-                }
-            } catch (InterruptedException e) {
-                Log.i("AdWatcher", "Insomnia!");
-            }
-        }
-    }*/
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        fetchCalculationsLeft();
+    }
 }
